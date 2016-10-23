@@ -42,7 +42,7 @@ class UserInterrupt(SevenZipError):
 
 class SevenZip(object):
     @property
-    def packerPath(self):
+    def packer_path(self):
         path = distutils.spawn.find_executable('7z')
         if path is None:
             raise EnvironmentError('Packer class can not find 7z executable')
@@ -70,22 +70,22 @@ class SevenZip(object):
         else:
             raise SevenZipError
 
-    def extract(self, zipPath, toPath=''):
-        assert zipPath, (
+    def extract(self, zip_path, to_path=''):
+        assert zip_path, (
             'Packer extract function need path from '
             'which it will be extracting.'
         )
-        if not toPath:
-            toPath = zipPath + '_TMP'
-        command = [self.packerPath, 'x', '-y',
-                   '-o%s' % toPath, '%s' % zipPath]
-        commandResult = self.run(command)
-        return commandResult
+        if not to_path:
+            to_path = zip_path + '_TMP'
+        command = [self.packer_path, 'x', '-y',
+                   '-o%s' % to_path, '%s' % zip_path]
+        command_result = self.run(command)
+        return command_result
 
-    def pack(self, zipPath, archivePath='*'):
-        assert zipPath, 'Packed zip must have name'
-        assert archivePath, 'There must be source of zip, right?'
-        command = [self.packerPath, 'a', '-tzip',
-                   '-mx=9', '../%s' % zipPath, archivePath]
-        commandResult = self.run(command)
-        return commandResult
+    def pack(self, zip_path, archive_path='*'):
+        assert zip_path, 'Packed zip must have name'
+        assert archive_path, 'There must be source of zip, right?'
+        command = [self.packer_path, 'a', '-tzip',
+                   '-mx=9', '../%s' % zip_path, archive_path]
+        command_result = self.run(command)
+        return command_result
