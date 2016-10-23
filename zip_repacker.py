@@ -2,13 +2,9 @@
 import os
 import subprocess
 import glob
+from sevenzip_wrapper import SevenZip, SevenZipError
 
-
-def run(command):
-    print('Calling command: %s' % command)
-    subprocess.run(command, check=True)
-
-
+packer = SevenZip()
 current_directory = os.getcwd()
 print('Current directory %s' % current_directory)
 zip_files = glob.glob('*.zip')
@@ -17,13 +13,19 @@ print('Found zips: %s' % zip_files)
 for zipname in glob.glob('*.zip'):
     templorary_name = '%s_tmp' % zipname
     print('Unpacking zip %s to %s' % (zipname, templorary_name))
-    run(['7z', 'x', '-y', '-o%s' % templorary_name, '%s' % zipname])
+    try:
+        packer.extract(zipPath=zipname, toPath=templorary_name)
+    except SevenZipError as exc:
+        print(exc)
     print('Removing zip file')
     os.remove(zipname)
     print('Changing directory to %s' % templorary_name)
     os.chdir(templorary_name)
     print('Compresing %s content to %s' % (templorary_name, zipname))
-    run(['7z', 'a', '-tzip', '-mx=9', '../%s' % zipname, '*'])
+    try:
+        packer.pack(zipPath=zipname, archivePath='*')
+    except SevenZipError as exc:
+        print(exc)
     os.chdir(current_directory)
     print('Comming back to %s' % current_directory)
-    run(['rm', '-rf', '%s' % templorary_name])
+    subprocess.run(['rm', '-rf', '%s' % templorary_name])
